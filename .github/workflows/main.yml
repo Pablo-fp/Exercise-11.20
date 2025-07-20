@@ -18,8 +18,10 @@ jobs:
           node-version: '20'
       - name: Install dependencies
         run: npm install
-    
-      
+        working-directory: ./backend
+      - name: Check style
+        run: npm run eslint
+        working-directory: ./backend
 
   deploy:
     needs: simple_deployment_pipeline
@@ -32,6 +34,9 @@ jobs:
 
   tag_release:
     needs: deploy
+    permissions:
+      # This is required to allow the action to push a new tag.
+      contents: write
     runs-on: ubuntu-latest
     # Corrected 'if' condition
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(join(github.event.commits.*.message, ' '), '#skip') }}
